@@ -21,12 +21,13 @@ ENV PATH=$CONDA_DIR/bin:$PATH
 WORKDIR /workspace
 COPY . .
 
-RUN conda create -n surfel_splatting python=3.7.16 && conda init bash
+RUN conda create -n gaussian_splatting python=3.7.16 && conda init bash
 
-SHELL ["conda", "run", "-n", "surfel_splatting", "/bin/bash", "-c"]
+SHELL ["conda", "run", "-n", "gaussian_splatting", "/bin/bash", "-c"]
 
 RUN pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu113 \
-  && pip install submodules/diff-surfel-rasterization \
+  && pip install submodules/diff-gaussian-rasterization \
+  && pip install submodules/fused-ssim \
   && pip install submodules/simple-knn
 
-# ENTRYPOINT ["conda", "run", "-n", "surfel_splatting", "/bin/bash", "-c"]
+# ENTRYPOINT ["conda", "run", "-n", "gaussian_splatting", "/bin/bash", "-c"]
