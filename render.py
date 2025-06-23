@@ -42,6 +42,10 @@ def render_set(model_path, name, iteration, views, gaussians, pipeline, backgrou
         render_time = time.time() - t1
         render_times.append(render_time)
         gt = view.original_image[0:3, :, :]
+        
+        if view.alpha_mask is not None:
+            alpha_mask = view.alpha_mask.cuda()
+            gt *= alpha_mask
 
         if args.train_test_exp:
             rendering = rendering[..., rendering.shape[-1] // 2:]
