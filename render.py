@@ -11,8 +11,7 @@
 
 import torch
 from scene import Scene
-import os, time
-import numpy as np
+import os
 from tqdm import tqdm
 from os import makedirs
 from gaussian_renderer import render
@@ -35,29 +34,16 @@ def render_set(model_path, name, iteration, views, gaussians, pipeline, backgrou
     makedirs(render_path, exist_ok=True)
     makedirs(gts_path, exist_ok=True)
 
-    render_times = []
     for idx, view in enumerate(tqdm(views, desc="Rendering progress")):
-        t1 = time.time()
         rendering = render(view, gaussians, pipeline, background, use_trained_exp=train_test_exp, separate_sh=separate_sh)["render"]
-        render_time = time.time() - t1
-        render_times.append(render_time)
         gt = view.original_image[0:3, :, :]
         
-        if view.alpha_mask is not None:
-            alpha_mask = view.alpha_mask.cuda()
-            gt *= alpha_mask
-
         if args.train_test_exp:
             rendering = rendering[..., rendering.shape[-1] // 2:]
             gt = gt[..., gt.shape[-1] // 2:]
 
         torchvision.utils.save_image(rendering, os.path.join(render_path, '{0:05d}'.format(idx) + ".png"))
         torchvision.utils.save_image(gt, os.path.join(gts_path, '{0:05d}'.format(idx) + ".png"))
-    
-    with open(model_path + "/fps.txt", 'w') as fp:
-        fps = 1.0/np.array(render_times).mean()
-        fp.write('fps:{}\n'.format(fps))
-        fp.write('count:{}'.format(len(gaussians.get_xyz)))
 
 def render_sets(dataset : ModelParams, iteration : int, pipeline : PipelineParams, skip_train : bool, skip_test : bool, separate_sh: bool):
     with torch.no_grad():
