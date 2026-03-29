@@ -105,7 +105,7 @@ def readColmapCameras(cam_extrinsics, cam_intrinsics, depths_params, images_fold
             except:
                 print("\n", key, "not found in depths_params")
 
-        image_path = os.path.join(images_folder, extr.name).replace('.JPG', '.jpg').replace('\\','/')
+        image_path = os.path.join(images_folder, extr.name).replace('\\','/')
         image_name = extr.name
         depth_path = os.path.join(depths_folder, f"{extr.name[:-n_remove]}.png") if depths_folder != "" else ""
 
